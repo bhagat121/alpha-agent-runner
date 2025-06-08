@@ -8,7 +8,7 @@ An interactive tool that lets users enter a prompt and choose between a calculat
 
 ### Frontend Tech Stack:
 
-* React (Client Components)
+* Netx.js (Client Components)
 * TailwindCSS
 
 #### Functionality:
@@ -132,7 +132,7 @@ frontend/
 
 ---
 
-## 🌱 Future Ideas
+## Future Ideas
 
 * User authentication
 * View past runs
