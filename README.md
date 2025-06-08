@@ -1,67 +1,85 @@
-Architecture Overview
+# Alpha Agent Runner
 
-Frontend
-Tech Stack: React (Client Components), TailwindCSS
+An interactive tool that lets users enter a prompt and choose between a calculator or web-search agent to receive chatbot-style responses in real time.
 
-Function:
+---
 
-Lets users input prompts.
+## Architecture Overview
 
-Select between calculator or web-search tools.
+### Frontend Tech Stack:
 
-Submits prompt to backend and streams AI response.
+* React (Client Components)
+* TailwindCSS
 
-Displays results in a smooth typing animation.
+#### Functionality:
 
-Backend
-Tech Stack: Express.js + TypeScript
+* Users' input prompts
+* Select between **calculator** or **web-search** tools
+* Submits prompt to backend and streams AI response
+* Displays results in a smooth typing animation
 
-Services:
+### Backend Tech Stack:
 
-/run API receives prompt + tool
+* Express.js + TypeScript
 
-Processes prompt via calculator or SERP API
+#### Services:
 
-Converts the raw result to a chatbot-style response using Gemini API (streamed)
+* `/run` API receives prompt + tool
+* Processes prompt via **calculator** or **SERP API**
+* Uses **Gemini API** to generate a chatbot-style response (streamed)
+* Saves the run in **PostgreSQL** (`runs` table)
+* Stores last 10 runs in **Redis** cache
 
-Saves the run in PostgreSQL: runs table
+---
 
-Stores last 10 runs in Redis cache
+## Key Design Decisions
 
-Key Design Decisions
-Streaming Responses:
+### Streaming Responses:
 
-Enhances UX with real-time typing effect.
+* Enhances UX with real-time typing effect
 
-PostgreSQL Logging:
+### PostgreSQL Logging:
 
-Persistent storage of prompt, tool, raw result, and LLM response.
+* Persistent storage of:
 
-Redis Caching:
+  * prompt
+  * tool
+  * raw result
+  * LLM response
 
-Quickly access recent runs for a user (future personalization).
+### Redis Caching:
 
-Modular Design:
+* Fast access to recent runs (future personalization)
 
-Services like webSearch, calculate, streamFriendlyResponse are isolated for testability.
+### Modular Design:
 
-How to Run Locally
+* Services like `webSearch`, `calculate`, `streamFriendlyResponse` are isolated and testable
 
-1. Clone the repo
+---
 
-git clone <repo link>
+## How to Run Locally
+
+### 1. Clone the repo
+
+```bash
+git clone <your-repo-url>
 cd agent-runner
+```
 
-2. Setup .env
+### 2. Setup `.env`
 
+```
 PORT=4000
 DATABASE_URL=postgres://postgres:<your_password>@localhost:5432/agent_runner
-GEMINI_API_KEY=your_google_gemini_api_key
-SERP_API_KEY=your_serpapi_key
+GEMINI_API_KEY=<your_gemini_api_key>
+SERP_API_KEY=<your_serp_api_key>
+```
 
-3. Start PostgreSQL & Redis (locally installed)
-PostgreSQL should have a runs table:
+### 3. Start PostgreSQL & Redis
 
+* PostgreSQL must have the following table:
+
+```sql
 CREATE TABLE IF NOT EXISTS runs (
   id SERIAL PRIMARY KEY,
   timestamp TIMESTAMPTZ DEFAULT NOW(),
@@ -70,37 +88,53 @@ CREATE TABLE IF NOT EXISTS runs (
   raw_result TEXT,
   response TEXT
 );
+```
 
-Redis should be running on default port (6379)
+* Redis should be running on default port: **6379**
 
-4. Install dependencies & start
+### 4. Install dependencies and start
 
-# From backend/
+#### Backend
+
+```bash
+cd backend
 npm install
 npm run dev
+```
 
-# From frontend/
+#### Frontend
+
+```bash
+cd frontend
 npm install
 npm run dev
+```
 
-Folder Structure (simplified)
+---
 
+## Folder Structure (Simplified)
+
+```
 backend/
-  ├── routes/
-  │   └── run.ts
-  ├── services/
-  │   ├── calculator.ts
-  │   ├── webSearch.ts
-  ├── llm.ts
-  ├── db.ts
-  └── index.ts
+├── routes/
+│   └── run.ts
+├── services/
+│   ├── calculator.ts
+│   └── webSearch.ts
+├── llm.ts
+├── db.ts
+└── index.ts
+
 frontend/
-  └── app/
-      └── PromptComposer.tsx
+└── app/
+    └── PromptComposer.tsx
+```
 
-Future Ideas
+---
 
-User auth
-View past runs
-Additional tools (e.g., Wikipedia, WolframAlpha)
-Conversation context (via memory)
+## 🌱 Future Ideas
+
+* User authentication
+* View past runs
+* Add more tools (Wikipedia, WolframAlpha)
+* Add conversation context via memory
